@@ -2,9 +2,7 @@ package com.lg.grades;
 
 import com.mysql.jdbc.Connection;
 import java.awt.Color;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.ResultSet;
+import java.sql.*;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -17,6 +15,8 @@ public class ClassGrades extends javax.swing.JFrame {
 
     public ClassGrades() {
         initComponents();
+        llenarCombobox();
+        setLocationRelativeTo(null);
     }
 
     @SuppressWarnings("unchecked")
@@ -43,9 +43,8 @@ public class ClassGrades extends javax.swing.JFrame {
         jSeparator3 = new javax.swing.JSeparator();
         GeneralaAverage = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jSeparator5 = new javax.swing.JSeparator();
-        ClassNumber = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        ClassNumber = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
@@ -161,10 +160,7 @@ public class ClassGrades extends javax.swing.JFrame {
         Students.setFont(new java.awt.Font("Roboto Light", 0, 12)); // NOI18N
         Students.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+
             },
             new String [] {
                 "Student ID", "Java", "Math", "SQL", "English", "Average"
@@ -177,13 +173,10 @@ public class ClassGrades extends javax.swing.JFrame {
         General.setFont(new java.awt.Font("Roboto Light", 0, 12)); // NOI18N
         General.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Java", "Math", "SQL", "English"
+                "English", "SQL", "Java", "Math"
             }
         ));
         jScrollPane2.setViewportView(General);
@@ -206,22 +199,11 @@ public class ClassGrades extends javax.swing.JFrame {
         Background.add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 570, 200, 20));
 
         GeneralaAverage.setFont(new java.awt.Font("Roboto Light", 0, 12)); // NOI18N
-        GeneralaAverage.setText("PUNTAJE");
-        Background.add(GeneralaAverage, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 550, 70, -1));
+        Background.add(GeneralaAverage, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 550, 70, 20));
 
         jLabel7.setFont(new java.awt.Font("Roboto Light", 0, 14)); // NOI18N
         jLabel7.setText("Student Grades");
         Background.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, -1, -1));
-        Background.add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 160, 90, 10));
-
-        ClassNumber.setFont(new java.awt.Font("Roboto Light", 0, 12)); // NOI18N
-        ClassNumber.setBorder(null);
-        ClassNumber.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                ClassNumberMousePressed(evt);
-            }
-        });
-        Background.add(ClassNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 140, 90, -1));
 
         jButton1.setBackground(new java.awt.Color(0, 0, 0));
         jButton1.setFont(new java.awt.Font("Roboto Black", 0, 14)); // NOI18N
@@ -233,6 +215,8 @@ public class ClassGrades extends javax.swing.JFrame {
             }
         });
         Background.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 140, -1, -1));
+
+        Background.add(ClassNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 140, 90, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -283,12 +267,79 @@ public class ClassGrades extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_MenuMouseClicked
 
-    private void ClassNumberMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ClassNumberMousePressed
-
-    }//GEN-LAST:event_ClassNumberMousePressed
-
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
-        String clase = ClassNumber.getText();
+        String clase = ClassNumber.getSelectedItem().toString();
+        float promedio = (float) 0.0;
+        Object students[] = new Object[6];
+        Object grade[] = new Object[4];
+        ResultSet rs, rs1, rs2;
+        DefaultTableModel modelo;
+        DefaultTableModel modelo2;
+        modelo = (DefaultTableModel) Students.getModel();
+        modelo2 = (DefaultTableModel) General.getModel();
+        modelo.setRowCount(0);
+        modelo2.setRowCount(0);
+
+        try {
+
+            PreparedStatement ps2 = conectividad.prepareStatement(
+                    "SELECT avg((EnglishGrade+SQLGrade+JavaGrade+MathGrade)/4) as StudentAVG from class_01 where ClassCode = ?");
+            ps2.setString(1, clase);
+            rs2 = ps2.executeQuery();
+            while (rs2.next()) {
+                promedio = rs2.getFloat("StudentAVG");
+            }
+            float promedio2 = Math.round(promedio * 100.0f) / 100.0f;
+            GeneralaAverage.setText(Float.toString(promedio2));
+
+            PreparedStatement ps1 = conectividad.prepareStatement(
+                    "SELECT avg(EnglishGrade) as English, avg(SQLGrade) as 'SQL', avg(JavaGrade) as Java, avg(MathGrade) as Math from class_01 where ClassCode = ?");
+            ps1.setString(1, clase);
+            rs1 = ps1.executeQuery();
+            while (rs1.next()) {
+                grade[0] = rs1.getFloat("English");
+                grade[1] = rs1.getFloat("SQL");
+                grade[2] = rs1.getFloat("Java");
+                grade[3] = rs1.getFloat("Math");
+                modelo2.addRow(grade);
+            }
+
+            General.setModel(modelo2);
+
+            PreparedStatement ps = conectividad.prepareStatement(
+                    "SELECT StudentID, EnglishGrade, SQLGrade, JavaGrade, MathGrade, AVG((EnglishGrade + SQLGrade + JavaGrade + MathGrade) / 4) AS StudentAVG\n" +
+"FROM class_01\n" +
+"WHERE ClassCode = ?\n" +
+"GROUP BY StudentID, EnglishGrade, SQLGrade, JavaGrade, MathGrade");
+            ps.setString(1, clase);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                students[0] = rs.getString("StudentID");
+                students[1] = rs.getFloat("EnglishGrade");
+                students[2] = rs.getFloat("SQLGrade");
+                students[3] = rs.getFloat("JavaGrade");
+                students[4] = rs.getFloat("MathGrade");
+                students[5] = Math.round(rs.getFloat("StudentAVG") * 100.0f)/100.0f;
+                modelo.addRow(students);
+            }
+
+            Students.setModel(modelo);
+
+        } catch (SQLException ex) {
+            System.out.println("Error " + ex);
+        }
+
+        /*
+        
+        try {
+            Statement ps2 = conectividad.createStatement();
+            ResultSet rs = ps2.executeQuery("SELECT * FROM class_01 WHERE ClassCode = ");
+            if (rs.next()) {
+                ClassNumber.addItem(rs.getString("ClassCode"));
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error " + ex);
+        }
         DefaultTableModel modelo = new DefaultTableModel();
         DefaultTableModel modelo2 = new DefaultTableModel();
         ResultSet rs = Conn.getTable("select StudentID, EnglishGrade, SQLGrade, JavaGrade, MathGrade, avg((EnglishGrade+SQLGrade+JavaGrade+MathGrade)/4) as StudentAVG from class_01 where ClassCode = " + clase);
@@ -308,7 +359,7 @@ public class ClassGrades extends javax.swing.JFrame {
         General.setModel(modelo2);
         }catch(Exception e){
             System.out.println("Error: "+e);
-        }
+        }*/
     }//GEN-LAST:event_jButton1MouseClicked
 
     /**
@@ -348,7 +399,7 @@ public class ClassGrades extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Background;
-    private javax.swing.JTextField ClassNumber;
+    private javax.swing.JComboBox<String> ClassNumber;
     private javax.swing.JLabel CloseForGood;
     public javax.swing.JTable General;
     private javax.swing.JLabel GeneralaAverage;
@@ -369,6 +420,18 @@ public class ClassGrades extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JSeparator jSeparator5;
     // End of variables declaration//GEN-END:variables
+
+    private void llenarCombobox() {
+        try {
+            Statement ps2 = conectividad.createStatement();
+            ResultSet rs = ps2.executeQuery("SELECT DISTINCT ClassCode FROM class_01");
+            while (rs.next()) {
+                ClassNumber.addItem(rs.getString("ClassCode"));
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error " + ex);
+        }
+
+    }
 }

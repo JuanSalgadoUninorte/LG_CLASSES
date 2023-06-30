@@ -5,18 +5,15 @@ import java.sql.*;
 
 public class Conn {
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/nombre_base_datos";
-    private static final String USER = "usuario";
-    private static final String PASSWORD = "contraseña";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/lg_classes";
+    private static final String USER = "root";
+    private static final String PASSWORD = "";
 
     public static Connection conectado() {
 
         Connection conectividad = null;
         try {
             conectividad = (Connection) DriverManager.getConnection(DB_URL, USER, PASSWORD);
-            if (conectividad != null) {
-                System.out.println("Conexión exitosa a la base de datos MySQL");
-            }
         } catch (SQLException e) {
             System.out.println("Error al conectar a la base de datos: " + e.getMessage());
         }

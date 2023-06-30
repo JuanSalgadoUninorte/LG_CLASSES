@@ -1,56 +1,85 @@
--- MySQL dump 10.13  Distrib 8.0.33, for Win64 (x86_64)
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
 --
--- Host: localhost    Database: lg_classes
--- ------------------------------------------------------
--- Server version	8.0.33
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 30-06-2023 a las 07:21:42
+-- Versión del servidor: 10.4.28-MariaDB
+-- Versión de PHP: 8.0.28
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
--- Table structure for table `class_01`
+-- Base de datos: `lg_classes`
 --
 
-DROP TABLE IF EXISTS `class_01`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `class_01`
+--
+
 CREATE TABLE `class_01` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `StudentCode` varchar(6) NOT NULL,
+  `id` int(11) NOT NULL,
+  `StudentID` varchar(11) NOT NULL,
   `EnglishGrade` float NOT NULL,
   `SQLGrade` float NOT NULL,
   `JavaGrade` float NOT NULL,
   `MathGrade` float NOT NULL,
-  `ClassCode` int NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  `ClassCode` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `class_01`
+-- Volcado de datos para la tabla `class_01`
 --
 
-LOCK TABLES `class_01` WRITE;
-/*!40000 ALTER TABLE `class_01` DISABLE KEYS */;
-INSERT INTO `class_01` VALUES (1,'STD01',79,91,94,86,1),(2,'STD02',59,81,67,67,1),(3,'STD03',88,79,87,85,1),(4,'STD04',89,93,90,75,1);
-/*!40000 ALTER TABLE `class_01` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+INSERT INTO `class_01` (`id`, `StudentID`, `EnglishGrade`, `SQLGrade`, `JavaGrade`, `MathGrade`, `ClassCode`) VALUES
+(1, 'STD1', 79, 91, 94, 86, 1),
+(2, 'STD2', 59, 81, 67, 79, 1),
+(3, 'STD3', 88, 79, 87, 85, 1),
+(4, 'STD4', 89, 93, 90, 75, 1),
+(5, 'STD1', 89, 93, 90, 75, 2),
+(6, 'STD2', 80, 78, 67, 73, 2),
+(7, 'STD3', 88, 92, 89, 74, 2),
+(8, 'STD4', 75, 75, 70, 80, 2),
+(9, 'STD5', 75, 80, 80, 80, 2),
+(10, 'STD6', 85, 80, 80, 85, 2),
+(11, 'STD7', 85, 90, 90, 90, 2),
+(12, 'STD8', 100, 100, 100, 100, 2),
+(13, 'STD9', 85, 80, 80, 75, 2),
+(14, 'STD10', 79, 81, 59, 67, 2),
+(15, 'STD11', 68, 72, 65, 75, 2),
+(16, 'STD12', 90, 93, 75, 89, 2);
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `class_01`
+--
+ALTER TABLE `class_01`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `class_01`
+--
+ALTER TABLE `class_01`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+COMMIT;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2023-06-29 13:44:59
