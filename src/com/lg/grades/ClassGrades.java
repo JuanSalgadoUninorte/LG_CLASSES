@@ -1,8 +1,24 @@
 package com.lg.grades;
 
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.mysql.jdbc.Connection;
 import java.awt.Color;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -10,6 +26,16 @@ public class ClassGrades extends javax.swing.JFrame {
 
     Conn conexion = new Conn();
     Connection conectividad = conexion.conectado();
+    DefaultTableModel modelo;
+    DefaultTableModel modelo2;
+    Document document;
+    FileOutputStream archive;
+    Paragraph title;
+    List<Individual> people = new ArrayList<>();
+    List<Individual> people2 = new ArrayList<>();
+    LocalDateTime actualDate = LocalDateTime.now();
+            DateTimeFormatter format = DateTimeFormatter.ofPattern("MMMM dd HH-mm yyyy");
+            String dateFormatted = actualDate.format(format);
 
     int xMouse, yMouse;
 
@@ -45,6 +71,7 @@ public class ClassGrades extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         ClassNumber = new javax.swing.JComboBox<>();
+        GeneralPDF = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
@@ -181,7 +208,7 @@ public class ClassGrades extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(General);
 
-        Background.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 540, 300, 60));
+        Background.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 540, 300, 50));
 
         jLabel1.setFont(new java.awt.Font("Roboto Light", 0, 14)); // NOI18N
         jLabel1.setText("Class");
@@ -217,6 +244,17 @@ public class ClassGrades extends javax.swing.JFrame {
         Background.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 140, -1, -1));
 
         Background.add(ClassNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 140, 90, -1));
+
+        GeneralPDF.setBackground(new java.awt.Color(0, 0, 0));
+        GeneralPDF.setFont(new java.awt.Font("Roboto Black", 1, 12)); // NOI18N
+        GeneralPDF.setForeground(new java.awt.Color(255, 255, 255));
+        GeneralPDF.setText("GENERATE PDF");
+        GeneralPDF.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                GeneralPDFMouseClicked(evt);
+            }
+        });
+        Background.add(GeneralPDF, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 600, 130, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -273,8 +311,6 @@ public class ClassGrades extends javax.swing.JFrame {
         Object students[] = new Object[6];
         Object grade[] = new Object[4];
         ResultSet rs, rs1, rs2;
-        DefaultTableModel modelo;
-        DefaultTableModel modelo2;
         modelo = (DefaultTableModel) Students.getModel();
         modelo2 = (DefaultTableModel) General.getModel();
         modelo.setRowCount(0);
@@ -296,31 +332,45 @@ public class ClassGrades extends javax.swing.JFrame {
                     "SELECT avg(EnglishGrade) as English, avg(SQLGrade) as 'SQL', avg(JavaGrade) as Java, avg(MathGrade) as Math from class_01 where ClassCode = ?");
             ps1.setString(1, clase);
             rs1 = ps1.executeQuery();
+            Individual grupal = new Individual();
             while (rs1.next()) {
                 grade[0] = rs1.getFloat("English");
+                grupal.setEnglishGradeTXT(Float.toString(rs1.getFloat("English")));
                 grade[1] = rs1.getFloat("SQL");
+                grupal.setSQLGradeTXT(Float.toString(rs1.getFloat("SQL")));
                 grade[2] = rs1.getFloat("Java");
+                grupal.setJavaGradeTXT(Float.toString(rs1.getFloat("Java")));
                 grade[3] = rs1.getFloat("Math");
+                grupal.setMathGradeTXT(Float.toString(rs1.getFloat("Math")));
                 modelo2.addRow(grade);
+                people.add(grupal);
             }
 
             General.setModel(modelo2);
-
             PreparedStatement ps = conectividad.prepareStatement(
-                    "SELECT StudentID, EnglishGrade, SQLGrade, JavaGrade, MathGrade, AVG((EnglishGrade + SQLGrade + JavaGrade + MathGrade) / 4) AS StudentAVG\n" +
-"FROM class_01\n" +
-"WHERE ClassCode = ?\n" +
-"GROUP BY StudentID, EnglishGrade, SQLGrade, JavaGrade, MathGrade");
+                    "SELECT StudentID, EnglishGrade, SQLGrade, JavaGrade, MathGrade, AVG((EnglishGrade + SQLGrade + JavaGrade + MathGrade) / 4) AS StudentAVG\n"
+                    + "FROM class_01\n"
+                    + "WHERE ClassCode = ?\n"
+                    + "GROUP BY StudentID, EnglishGrade, SQLGrade, JavaGrade, MathGrade");
             ps.setString(1, clase);
             rs = ps.executeQuery();
+            Individual grupal2 = new Individual();
             while (rs.next()) {
                 students[0] = rs.getString("StudentID");
+                grupal2.setStudentIDTXT(rs.getString("StudentID"));
                 students[1] = rs.getFloat("EnglishGrade");
+                grupal2.setEnglishGradeTXT2(Float.toString(rs.getFloat("EnglishGrade")));
                 students[2] = rs.getFloat("SQLGrade");
+                grupal2.setSQLGradeTXT2(Float.toString(rs.getFloat("SQLGrade")));
                 students[3] = rs.getFloat("JavaGrade");
+                grupal2.setJavaGradeTXT2(Float.toString(rs.getFloat("JavaGrade")));
                 students[4] = rs.getFloat("MathGrade");
-                students[5] = Math.round(rs.getFloat("StudentAVG") * 100.0f)/100.0f;
+                grupal2.setMathGradeTXT2(Float.toString(rs.getFloat("MathGrade")));
+                students[5] = Math.round(rs.getFloat("StudentAVG") * 100.0f) / 100.0f;
+                String average = Float.toString(Math.round(rs.getFloat("StudentAVG") * 100.0f) / 100.0f);
+                grupal2.setStudentAverageTXT(average);
                 modelo.addRow(students);
+                people2.add(grupal2);
             }
 
             Students.setModel(modelo);
@@ -329,38 +379,76 @@ public class ClassGrades extends javax.swing.JFrame {
             System.out.println("Error " + ex);
         }
 
-        /*
-        
-        try {
-            Statement ps2 = conectividad.createStatement();
-            ResultSet rs = ps2.executeQuery("SELECT * FROM class_01 WHERE ClassCode = ");
-            if (rs.next()) {
-                ClassNumber.addItem(rs.getString("ClassCode"));
-            }
-        } catch (SQLException ex) {
-            System.out.println("Error " + ex);
-        }
-        DefaultTableModel modelo = new DefaultTableModel();
-        DefaultTableModel modelo2 = new DefaultTableModel();
-        ResultSet rs = Conn.getTable("select StudentID, EnglishGrade, SQLGrade, JavaGrade, MathGrade, avg((EnglishGrade+SQLGrade+JavaGrade+MathGrade)/4) as StudentAVG from class_01 where ClassCode = " + clase);
-        ResultSet rs2 = Conn.getTable("select avg(EnglishGrade) as EG, avg(SQLGrade) as SG, avg(JavaGrade) as JG, avg(MathGrade) as MG from ClassCode = " + clase);
-        try{
-            while(rs.next()){
-                modelo.addRow(new Object[]{rs.getString("StudentID"), rs.getString("EnglishGrade"), rs.getString("SQLGrade"), rs.getString("JavaGrade"), rs.getString("MathGrade"), rs.getString("StudentAVG")});
-            }
-        }catch(Exception e){
-            System.out.println("Error: "+e);
-        }
-        Students.setModel(modelo);
-        try{
-            while(rs.next()){
-                modelo.addRow(new Object[]{rs.getString("EG"), rs.getString("SG"), rs.getString("JG"), rs.getString("MG")});
-            }
-        General.setModel(modelo2);
-        }catch(Exception e){
-            System.out.println("Error: "+e);
-        }*/
     }//GEN-LAST:event_jButton1MouseClicked
+
+    private void GeneralPDFMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GeneralPDFMouseClicked
+        document = new Document();
+        title = new Paragraph("Class " + ClassNumber.getSelectedItem().toString() + " Grades");
+        try {
+            archive = new FileOutputStream("PDFs/Class " + ClassNumber.getSelectedItem().toString() + " Grades "+dateFormatted+".pdf");
+            PdfWriter.getInstance(document, archive);
+            document.open();
+            title.setAlignment(1);
+            document.add(title);
+            document.add(Chunk.NEWLINE);
+            document.add(new Paragraph("Student grades"));
+            document.add(Chunk.NEWLINE);
+            PdfPTable tableByStudents = new PdfPTable(6);
+            tableByStudents.setWidthPercentage(100);
+            PdfPCell StudentID = new PdfPCell(new Phrase("StudentID"));
+            PdfPCell EnglishGradeST = new PdfPCell(new Phrase("English"));
+            PdfPCell SQLGradeST = new PdfPCell(new Phrase("SQL"));
+            PdfPCell JavaGradeST = new PdfPCell(new Phrase("Java"));
+            PdfPCell MathGradeST = new PdfPCell(new Phrase("Math"));
+            PdfPCell StudentAverage = new PdfPCell(new Phrase("Average"));
+            tableByStudents.addCell(StudentID);
+            tableByStudents.addCell(EnglishGradeST);
+            tableByStudents.addCell(SQLGradeST);
+            tableByStudents.addCell(JavaGradeST);
+            tableByStudents.addCell(MathGradeST);
+            tableByStudents.addCell(StudentAverage);
+
+            for (Individual total : this.people2) {
+                tableByStudents.addCell(total.getStudentIDTXT());
+                tableByStudents.addCell(total.getEnglishGradeTXT2());
+                tableByStudents.addCell(total.getSQLGradeTXT2());
+                tableByStudents.addCell(total.getJavaGradeTXT2());
+                tableByStudents.addCell(total.getMathGradeTXT2());
+                tableByStudents.addCell(total.getStudentAverageTXT());
+            }
+            document.add(tableByStudents);
+            document.add(Chunk.NEWLINE);
+            document.add(new Paragraph("General grades by subject"));
+            document.add(Chunk.NEWLINE);
+            PdfPTable table = new PdfPTable(4);
+            table.setWidthPercentage(100);
+            PdfPCell EnglishGrade = new PdfPCell(new Phrase("English"));
+            PdfPCell SQLGrade = new PdfPCell(new Phrase("SQL"));
+            PdfPCell JavaGrade = new PdfPCell(new Phrase("Java"));
+            PdfPCell MathGrade = new PdfPCell(new Phrase("Math"));
+            table.addCell(EnglishGrade);
+            table.addCell(SQLGrade);
+            table.addCell(JavaGrade);
+            table.addCell(MathGrade);
+
+            for (Individual individual : this.people) {
+                table.addCell(individual.getEnglishGradeTXT());
+                table.addCell(individual.getSQLGradeTXT());
+                table.addCell(individual.getJavaGradeTXT());
+                table.addCell(individual.getMathGradeTXT());
+            }
+            document.add(table);
+            document.add(Chunk.NEWLINE);
+            document.add(new Paragraph("General Grade Average: "+GeneralaAverage.getText()));
+            document.add(Chunk.NEWLINE);
+            document.add(new Paragraph("Date: " + dateFormatted));
+            document.close();
+            JOptionPane.showMessageDialog(null, "PDF Successfuly Generated");
+
+        } catch (Exception ex) {
+            System.out.println("PDF Generation failed with error: " + ex);
+        }
+    }//GEN-LAST:event_GeneralPDFMouseClicked
 
     /**
      * @param args the command line arguments
@@ -402,6 +490,7 @@ public class ClassGrades extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> ClassNumber;
     private javax.swing.JLabel CloseForGood;
     public javax.swing.JTable General;
+    private javax.swing.JButton GeneralPDF;
     private javax.swing.JLabel GeneralaAverage;
     private javax.swing.JPanel Header;
     private javax.swing.JButton Menu;
