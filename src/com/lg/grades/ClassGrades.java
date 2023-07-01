@@ -443,7 +443,7 @@ public class ClassGrades extends javax.swing.JFrame {
             document.add(Chunk.NEWLINE);
             document.add(new Paragraph("Date: " + dateFormatted));
             document.close();
-            JOptionPane.showMessageDialog(null, "PDF Successfuly Generated");
+            JOptionPane.showMessageDialog(null, "PDF Generated Successfuly In The Folder PDFs");
 
         } catch (Exception ex) {
             System.out.println("PDF Generation failed with error: " + ex);
