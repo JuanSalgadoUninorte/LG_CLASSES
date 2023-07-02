@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 30-06-2023 a las 07:21:42
+-- Tiempo de generación: 02-07-2023 a las 05:43:01
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.0.28
 
@@ -57,7 +57,12 @@ INSERT INTO `class_01` (`id`, `StudentID`, `EnglishGrade`, `SQLGrade`, `JavaGrad
 (13, 'STD9', 85, 80, 80, 75, 2),
 (14, 'STD10', 79, 81, 59, 67, 2),
 (15, 'STD11', 68, 72, 65, 75, 2),
-(16, 'STD12', 90, 93, 75, 89, 2);
+(16, 'STD12', 90, 93, 75, 89, 2),
+(17, 'STD5', 99.01, 99.01, 99.01, 99.01, 1),
+(18, 'STD1', 78.9, 100, 45.98, 12.09, 7),
+(19, 'STD1', 19, 19, 19, 18, 19),
+(20, 'STD1', 18, 18, 18, 10000, 17),
+(21, 'STD1', 1234, 1234, 1234, 1234, 90);
 
 --
 -- Índices para tablas volcadas
@@ -77,7 +82,7 @@ ALTER TABLE `class_01`
 -- AUTO_INCREMENT de la tabla `class_01`
 --
 ALTER TABLE `class_01`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
